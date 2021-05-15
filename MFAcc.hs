@@ -18,7 +18,7 @@ instance Show MFAcc where
 main :: IO ()
 main = do
   [n] <- getArgs
-  let acc = foldr (<>) mempty $ map (MFAcc . shows) [1..read n]
+  let acc = mconcat $ map (MFAcc . shows) [1..read n]
   print $ length $ un acc "."
   print $ Just (mempty :: MFAcc)
   print (mempty :: MFAcc, mempty :: MFAcc)
