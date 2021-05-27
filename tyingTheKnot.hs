@@ -17,6 +17,8 @@ data List a = List
 
 buildList :: [a] -> List a
 buildList []     = List Nothing Nothing
+buildList [x] = List node node where
+  node = Just $ Node Nothing x Nothing
 buildList (x:xs) = List first last
   where  first = Just $ Node Nothing x next
          (next, last) = go1 xs first
@@ -37,5 +39,7 @@ plist list = do
     bwd (Just node) = print (value node) >> bwd (prev node)
 
 main :: IO ()
-main = plist $ buildList "abcde"
-
+main = do
+  plist $ buildList ""
+  plist $ buildList "a"
+  plist $ buildList "abcde"
