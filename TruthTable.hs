@@ -1,4 +1,6 @@
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module TruthTable where
 
 import Data.Bifunctor (bimap, first)
