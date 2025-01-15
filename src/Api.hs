@@ -2,7 +2,7 @@
 
 module Api (api, server) where
 
-import Servant
+import Servant (Get, PlainText, Proxy (..), Server, (:>))
 
 -- Define the API type
 type API = "hello" :> Get '[PlainText] String
