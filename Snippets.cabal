@@ -98,7 +98,7 @@ executable Snippets
         , base ^>=4.17.2.1
         , servant-server ^>=0.20.2
         , warp ^>=3.4.7
-        , Snippets ^>=0.1
+        , Snippets ^>=0.1.0
 
     -- Directories containing source files.
     hs-source-dirs:   app
