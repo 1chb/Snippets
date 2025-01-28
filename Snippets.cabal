@@ -48,7 +48,7 @@ extra-doc-files:    CHANGELOG.md
 -- extra-source-files:
 
 common shared-all
-    ghc-options: -Wall
+    ghc-options: -Wall -Werror
 
     -- Base language which the package is written in.
     default-language: GHC2021
@@ -63,7 +63,13 @@ library
     import: shared-app
 
     -- Modules exported by the library.
-    exposed-modules:  Api, FunEqOrd, MyLib, Oil
+    exposed-modules:
+        , Api
+        , Database
+        , FunEqOrd
+        , Model
+        , MyLib
+        , Oil
 
     -- Modules included in this library but not exported.
     -- other-modules:
@@ -73,11 +79,13 @@ library
 
     -- Other library packages from which modules are imported.
     build-depends:
+        , aeson ^>=2.2.3
+        , monad-logger ^>=0.3.41
         , persistent ^>=2.14.6
         , persistent-postgresql ^>=2.13.6
         , persistent-template ^>=2.12.0
-        , aeson ^>=2.2.3
         , text ^>=2.0.2
+        , transformers ^>= 0.5.6
 
     hs-source-dirs:   src
 
