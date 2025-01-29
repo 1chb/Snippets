@@ -1,17 +1,15 @@
 module Main where
 
 import Api (api, server)
+import Database qualified (connectAndMigrate)
 import MyLib qualified (someFunc)
-import Network.Wai.Handler.Warp (run)
-import Servant (serve)
-import Database (withDbConnection, queryGreetings)
+import Network.Wai.Handler.Warp qualified as Wai (run)
+import Servant qualified (serve)
 
 main :: IO ()
 main = do
   putStrLn "Hello, Haskell!"
   MyLib.someFunc
-  greetings <- withDbConnection queryGreetings
-  print greetings
   -- Run the server
   putStrLn "Starting server on port 8080..."
-  run 8080 (serve api server)
+  Database.connectAndMigrate >>= Wai.run 8080 . Servant.serve api . server

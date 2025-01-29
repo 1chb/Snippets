@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Database (runDb, queryGreetings, withDbConnection) where
+module Database (runDb, queryGreetings, withDbConnection, connectAndMigrate) where
 
 import Control.Monad.IO.Unlift (MonadUnliftIO)
-import Control.Monad.Logger (LoggingT, runStdoutLoggingT)
+import Control.Monad.Logger (MonadLoggerIO, runStdoutLoggingT)
 import Control.Monad.Trans.Reader (ReaderT)
 import Database.Persist (Entity (..), selectList)
 import Database.Persist.Postgresql (ConnectionPool, ConnectionString, SqlBackend, createPostgresqlPool, runMigration, runSqlPool)
@@ -13,9 +13,15 @@ import Model (Greeting (..), migrateAll)
 connStr :: ConnectionString
 connStr = "host=localhost dbname=mydb user=myuser password=mypassword port=5432"
 
+connectAndMigrate :: IO ConnectionPool
+connectAndMigrate = do
+  pool <- runStdoutLoggingT $ createPostgresqlPool connStr 10
+  runSqlPool (runMigration migrateAll) pool
+  pure pool
+
 -- Create a connection pool
-withDbConnection :: (MonadUnliftIO m) => (ConnectionPool -> LoggingT m a) -> m a
-withDbConnection action = runStdoutLoggingT $ do
+withDbConnection :: (MonadUnliftIO m, MonadLoggerIO m) => (ConnectionPool -> m a) -> m a
+withDbConnection action = do
   pool <- createPostgresqlPool connStr 10
   runSqlPool (runMigration migrateAll) pool
   action pool
