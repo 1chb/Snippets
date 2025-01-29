@@ -4,7 +4,6 @@
 module Api (api, server) where
 
 import Data.Maybe (fromMaybe)
-import Model ()
 import Servant (Get, Header, Headers (..), JSON, PlainText, Proxy (..), Server, addHeader, (:<|>) (..), (:>))
 
 -- Define the API type
