@@ -8,11 +8,12 @@ import Data.Maybe (fromMaybe)
 import Database qualified as DB
 import Greeting qualified
 import Lucid (Html)
-import Servant (FormUrlEncoded, Get, Header, Headers (..), JSON, NoContent (..), PlainText, Post, Proxy (..), ReqBody, Server, addHeader, err303, errHeaders, throwError, (:<|>) (..), (:>))
+import Servant (FormUrlEncoded, Get, Header, Headers (..), JSON, NoContent (..), OctetStream, PlainText, Post, Proxy (..), ReqBody, Server, addHeader, err303, errHeaders, throwError, (:<|>) (..), (:>))
 import Servant.HTML.Lucid (HTML)
 
 type API =
-  Get '[HTML] (Html ())
+  "favicon.ico" :> Get '[OctetStream] NoContent
+    :<|> Get '[HTML] (Html ())
     :<|> "add-greeting" :> ReqBody '[FormUrlEncoded] Greeting.Form :> Post '[HTML] NoContent
     :<|> "old" :> Get '[PlainText] String
     :<|> "hello" :> Hellos
@@ -24,12 +25,14 @@ type Hellos =
 
 server :: DB.Environment -> Server API
 server env =
-  Greeting.get env
+  getFavicon
+    :<|> Greeting.get env
     :<|> (\form -> Greeting.add env form >> redirectTo "/")
     :<|> (concat <$> liftIO (DB.queryGreetings env))
     :<|> fmap ("Hello, " <>) <$> hellos -- Only hello to snd!
     :<|> return (addHeader 2 ["X", "Y"])
   where
+    getFavicon = return NoContent
     hellos = return . fromMaybe "???" :<|> return "there!"
     redirectTo path = throwError err303 {errHeaders = [("Location", path)]}
 
