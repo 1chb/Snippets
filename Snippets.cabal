@@ -67,6 +67,7 @@ library
         , Api
         , Database
         , FunEqOrd
+        , Greeting
         , Model
         , MyLib
         , Oil
