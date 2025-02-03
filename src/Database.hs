@@ -5,7 +5,7 @@ module Database (Environment, runDb, queryGreetings, connectAndMigrate, insertGr
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Logger (MonadLoggerIO, runStdoutLoggingT)
 import Control.Monad.Trans.Reader (ReaderT)
-import Database.Persist (Entity (..), selectList, insert_)
+import Database.Persist (Entity (..), insert_, selectList)
 import Database.Persist.Postgresql (ConnectionPool, ConnectionString, SqlBackend, createPostgresqlPool, runMigration, runSqlPool)
 import Model (Greeting (..), migrateAll)
 

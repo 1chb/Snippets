@@ -36,7 +36,6 @@ get env = do
       table greetings
       form
 
-add :: (MonadIO m) => DB.Environment -> Form -> m (Html ())
+add :: (MonadIO m) => DB.Environment -> Form -> m ()
 add env (Form newG) = do
   liftIO $ DB.insertGreeting env $ T.unpack newG
-  get env
