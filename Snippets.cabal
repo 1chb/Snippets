@@ -80,6 +80,7 @@ library
     -- Other library packages from which modules are imported.
     build-depends:
         , aeson ^>=2.2.3
+        , http-api-data ^>=0.6.1
         , lucid ^>=2.11.20230408
         , monad-logger ^>=0.3.41
         , persistent ^>=2.14.6

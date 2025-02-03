@@ -1,11 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Database (runDb, queryGreetings, withDbConnection, connectAndMigrate) where
+module Database (runDb, queryGreetings, withDbConnection, connectAndMigrate, insertGreeting) where
 
 import Control.Monad.IO.Unlift (MonadUnliftIO)
 import Control.Monad.Logger (MonadLoggerIO, runStdoutLoggingT)
 import Control.Monad.Trans.Reader (ReaderT)
-import Database.Persist (Entity (..), selectList)
+import Database.Persist (Entity (..), selectList, insert_)
 import Database.Persist.Postgresql (ConnectionPool, ConnectionString, SqlBackend, createPostgresqlPool, runMigration, runSqlPool)
 import Model (Greeting (..), migrateAll)
 
@@ -35,3 +35,7 @@ queryGreetings :: (MonadUnliftIO m) => ConnectionPool -> m [String]
 queryGreetings pool = runDb pool $ do
   greetings <- selectList [] []
   return $ map (\(Entity _ (Greeting msg)) -> msg) greetings
+
+insertGreeting :: (MonadUnliftIO m) => ConnectionPool -> String -> m ()
+insertGreeting pool msg = runDb pool $ do
+  insert_ $ Greeting msg

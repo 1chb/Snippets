@@ -1,9 +1,15 @@
 help:
-	@echo "Targets: deploy"
-	@echo "Variables:$(foreach var,SERVER, $(var)=$($(var)))"
+	@echo "Targets: deploy install"
+	@echo "Variables: $(foreach var,SERVER BINDIR EXECUTABLE,$(var)=$($(var)))"
 
 SERVER = base
+BINDIR = $(HOME)/.cabal/bin
+EXECUTABLE = Snippets
+SUFFIX := $(shell date +'%F+%2H.%2M.%2S')
 
-deploy:
-	cabal install --overwrite-policy=always
-	scp /home/christian/.cabal/bin/Snippets $(SERVER):Snippets_`date +'%F+%2H.%2M.%2S'`
+deploy: TARGET = $(EXECUTABLE)_$(SUFFIX)
+deploy: install
+	scp $(BINDIR)/$(EXECUTABLE) $(SERVER):$(TARGET)
+
+install:
+	cabal install --overwrite-policy=always exe:$(EXECUTABLE)
