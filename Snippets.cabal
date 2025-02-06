@@ -109,6 +109,7 @@ executable Snippets
     -- Other library packages from which modules are imported.
     build-depends:
         , warp ^>=3.4.7
+        , warp-tls ^>=3.4.12
         , Snippets ^>=0.1.0
 
     hs-source-dirs:   app
