@@ -1,9 +1,43 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Login (page) where
+module Login (Endpoints, handlers) where
 
+import Data.Text (Text)
 import Lucid (Html, action_, body_, br_, doctype_, form_, h1_, head_, html_, input_, label_, method_, name_, title_, type_, value_)
-import Servant (Handler)
+import Servant (FormUrlEncoded, Get, Handler, NoContent (..), Post, ReqBody, err401, errBody, throwError, (:<|>) (..), (:>))
+import Servant.HTML.Lucid (HTML)
+import Web.FormUrlEncoded (FromForm (..), parseUnique)
+
+data Form = LoginForm
+  { username :: Text,
+    password :: Text
+  }
+
+instance FromForm Form where
+  fromForm f =
+    LoginForm
+      <$> parseUnique "username" f
+      <*> parseUnique "password" f
+
+type Endpoints = GetPage :<|> PostRequest
+
+type GetPage = Get '[HTML] (Html ())
+
+type PostRequest = ReqBody '[FormUrlEncoded] Form :> Post '[HTML] NoContent
+
+handlers :: Handler b -> Handler (Html ()) :<|> (Form -> Handler b)
+handlers redirect = page :<|> \form -> handler form >> redirect
+
+handler :: Form -> Handler NoContent
+handler form = do
+  if authenticate (username form) (password form)
+    then return NoContent
+    else throwError err401 {errBody = "Invalid credentials"}
+
+authenticate :: Text -> Text -> Bool
+authenticate user pass =
+  user == "admin" && pass == "password" -- Simple hardcoded check
 
 page :: Handler (Html ())
 page = return $ do

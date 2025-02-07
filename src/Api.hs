@@ -9,13 +9,32 @@ import Database qualified as DB
 import Greeting qualified
 import Login qualified
 import Lucid (Html)
-import Servant (FormUrlEncoded, Get, Header, Headers (..), JSON, NoContent (..), OctetStream, PlainText, Post, Proxy (..), ReqBody, Server, addHeader, err303, errHeaders, throwError, (:<|>) (..), (:>))
+import Servant
+  ( FormUrlEncoded,
+    Get,
+    Header,
+    Headers (..),
+    JSON,
+    NoContent (..),
+    OctetStream,
+    PlainText,
+    Post,
+    Proxy (..),
+    ReqBody,
+    Server,
+    addHeader,
+    err303,
+    errHeaders,
+    throwError,
+    (:<|>) (..),
+    (:>),
+  )
 import Servant.HTML.Lucid (HTML)
 
 type API =
   "favicon.ico" :> Get '[OctetStream] NoContent
     :<|> Get '[HTML] NoContent -- Root path redirect
-    :<|> "login" :> Get '[HTML] (Html ())
+    :<|> "login" :> Login.Endpoints
     :<|> "greeting" :> Get '[HTML] (Html ())
     :<|> "add-greeting" :> ReqBody '[FormUrlEncoded] Greeting.Form :> Post '[HTML] NoContent
     :<|> "old" :> Get '[PlainText] String
@@ -30,7 +49,7 @@ server :: DB.Environment -> Server API
 server env =
   getFavicon
     :<|> redirectTo "/login"
-    :<|> Login.page
+    :<|> Login.handlers (redirectTo "greeting")
     :<|> Greeting.get env
     :<|> (\form -> Greeting.add env form >> redirectTo "greeting")
     :<|> (concat <$> liftIO (DB.queryGreetings env))
