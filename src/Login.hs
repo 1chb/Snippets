@@ -3,10 +3,12 @@
 
 module Login (Endpoints, handlers) where
 
+import Data.ByteString (ByteString)
 import Data.Text (Text)
 import Lucid (Html, action_, body_, br_, doctype_, form_, h1_, head_, html_, input_, label_, method_, name_, title_, type_, value_)
 import Servant (FormUrlEncoded, Get, Handler, NoContent (..), Post, ReqBody, err401, errBody, throwError, (:<|>) (..), (:>))
 import Servant.HTML.Lucid (HTML)
+import Util.Redirect (redirectTo)
 import Web.FormUrlEncoded (FromForm (..), parseUnique)
 
 data Form = LoginForm
@@ -26,8 +28,8 @@ type GetPage = Get '[HTML] (Html ())
 
 type PostRequest = ReqBody '[FormUrlEncoded] Form :> Post '[HTML] NoContent
 
-handlers :: Handler b -> Handler (Html ()) :<|> (Form -> Handler b)
-handlers redirect = page :<|> \form -> handler form >> redirect
+handlers :: ByteString -> Handler (Html ()) :<|> (Form -> Handler NoContent)
+handlers successPath = page :<|> \form -> handler form >> redirectTo successPath
 
 handler :: Form -> Handler NoContent
 handler form = do
