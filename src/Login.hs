@@ -3,7 +3,6 @@
 
 module Login (Endpoints, handlers) where
 
-import Data.ByteString (ByteString)
 import Data.Text (Text)
 import Lucid (Html, action_, body_, br_, doctype_, form_, h1_, head_, html_, input_, label_, method_, name_, title_, type_, value_)
 import Servant (FormUrlEncoded, Get, Handler, NoContent (..), Post, ReqBody, err401, errBody, throwError, (:<|>) (..), (:>))
@@ -28,7 +27,7 @@ type GetPage = Get '[HTML] (Html ())
 
 type PostRequest = ReqBody '[FormUrlEncoded] Form :> Post '[HTML] NoContent
 
-handlers :: ByteString -> Handler (Html ()) :<|> (Form -> Handler NoContent)
+handlers :: Text -> Handler (Html ()) :<|> (Form -> Handler NoContent)
 handlers successPath = page :<|> \form -> handler form >> redirectTo successPath
 
 handler :: Form -> Handler NoContent
