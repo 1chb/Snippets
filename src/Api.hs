@@ -13,7 +13,7 @@ import Servant.HTML.Lucid (HTML)
 
 type API =
   "favicon.ico" :> Get '[OctetStream] NoContent
-    :<|> Get '[HTML] (Html ())
+    :<|> "greeting" :> Get '[HTML] (Html ())
     :<|> "add-greeting" :> ReqBody '[FormUrlEncoded] Greeting.Form :> Post '[HTML] NoContent
     :<|> "old" :> Get '[PlainText] String
     :<|> "hello" :> Hellos

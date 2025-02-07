@@ -69,8 +69,8 @@ library
         , FunEqOrd
         , Greeting
         , Model
-        , MyLib
         , Oil
+        , Options
 
     -- Modules included in this library but not exported.
     -- other-modules:
@@ -84,6 +84,7 @@ library
         , http-api-data ^>=0.6.1
         , lucid ^>=2.11.20230408
         , monad-logger ^>=0.3.41
+        , optparse-applicative ^>=0.18.1
         , persistent ^>=2.14.6
         , persistent-postgresql ^>=2.13.6
         , persistent-template ^>=2.12.0
