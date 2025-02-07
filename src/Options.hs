@@ -1,33 +1,61 @@
 module Options (Options (..), getOptions) where
 
-import Options.Applicative (Parser, ParserInfo, execParser, fullDesc, header, help, helper, info, long, progDesc, short, switch, (<**>))
+import Options.Applicative
+  ( Parser,
+    ParserInfo,
+    auto,
+    execParser,
+    fullDesc,
+    header,
+    help,
+    helper,
+    info,
+    long,
+    metavar,
+    option,
+    progDesc,
+    short,
+    showDefaultWith,
+    switch,
+    value,
+    (<**>),
+  )
 
--- Define a data type to hold the command-line options
 data Options = Options
   { port :: Int,
     local :: Bool
   }
   deriving (Show)
 
--- Parser for the command-line options
-optionsParser :: Parser Options
-optionsParser =
-  Options 8080
-    <$> switch
-      ( long "local"
-          <> help "Run a local server using the http protocol on port 8080"
-          <> short 'l'
-      )
+getOptions :: IO Options
+getOptions = execParser optsParserInfo
 
--- ParserInfo for the command-line options
+optionsParser :: Parser Options
+optionsParser = fmap replaceMagic $ Options <$> portOption <*> localSwitch
+  where
+    portOption =
+      option auto $
+        long "port"
+          <> short 'p'
+          <> metavar "PORT"
+          <> help "Port to listen on"
+          <> value magicPort -- Hack to make default depend on the --local switch
+          <> showDefaultWith (const "443, or 8080 if --local is set")
+    magicPort = -1
+    replaceMagic opts
+      | port opts == magicPort = opts {port = if local opts then 8080 else 443}
+      | otherwise = opts
+    localSwitch =
+      switch $
+        long "local"
+          <> help "Run a local server using the http protocol"
+          <> short 'l'
+
 optsParserInfo :: ParserInfo Options
 optsParserInfo =
   info
     (optionsParser <**> helper)
     ( fullDesc
-        <> progDesc "This is a sample application with a --local flag"
-        <> header "Snippets App - a demonstration of a full feature web server"
+        <> header "Snippets App - a demonstration of a full featured web server"
+        <> progDesc "This is a sample application"
     )
-
-getOptions :: IO Options
-getOptions = execParser optsParserInfo

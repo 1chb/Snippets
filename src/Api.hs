@@ -27,7 +27,7 @@ server :: DB.Environment -> Server API
 server env =
   getFavicon
     :<|> Greeting.get env
-    :<|> (\form -> Greeting.add env form >> redirectTo "/")
+    :<|> (\form -> Greeting.add env form >> redirectTo "greeting")
     :<|> (concat <$> liftIO (DB.queryGreetings env))
     :<|> fmap ("Hello, " <>) <$> hellos -- Only hello to snd!
     :<|> return (addHeader 2 ["X", "Y"])

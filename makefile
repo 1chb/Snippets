@@ -1,5 +1,5 @@
 help:
-	@echo "Targets: deploy install"
+	@echo "Targets: deploy install dev"
 	@echo "Variables: $(foreach var,SERVER BINDIR EXECUTABLE,$(var)=$($(var)))"
 
 SERVER = base
@@ -13,3 +13,6 @@ deploy: install
 
 install:
 	cabal install --overwrite-policy=always exe:$(EXECUTABLE)
+
+dev: install
+	$(BINDIR)/$(EXECUTABLE) --local
