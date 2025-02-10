@@ -6,7 +6,7 @@ import Database qualified as DB
 import Greeting qualified
 import Login qualified
 import Login.Session qualified as Session
-import Servant (Get, Header, Headers (..), JSON, NoContent (..), OctetStream, PlainText, Proxy (..), Server, addHeader, (:<|>) (..), (:>))
+import Servant (AuthProtect, Get, Header, Headers (..), JSON, NoContent (..), OctetStream, PlainText, Proxy (..), Server, addHeader, (:<|>) (..), (:>))
 import Servant.HTML.Lucid (HTML)
 import Util.Redirect (redirectTo)
 
@@ -14,7 +14,7 @@ type API =
   "favicon.ico" :> Get '[OctetStream] NoContent
     :<|> Get '[HTML] NoContent -- Root path redirect
     :<|> "login" :> Login.Endpoints
-    :<|> "greeting" :> Greeting.Endpoints
+    :<|> AuthProtect "jwt-auth" :> "greeting" :> Greeting.Endpoints
     :<|> "old" :> Get '[PlainText] String
     :<|> "hello" :> Hellos
     :<|> "users" :> Get '[JSON] (Headers '[Header "User-Count" Integer] [String])
@@ -28,13 +28,14 @@ server dbEnv sessionEnv =
   getFavicon
     :<|> redirectTo [] "/login"
     :<|> Login.handlers sessionEnv "/greeting"
-    :<|> Greeting.handlers dbEnv "/greeting"
+    :<|> protected (Greeting.handlers dbEnv "/greeting")
     :<|> (concat <$> liftIO (DB.queryGreetings dbEnv))
     :<|> fmap ("Hello, " <>) <$> hellos -- Only hello to snd!
     :<|> return (addHeader 2 ["X", "Y"])
   where
     getFavicon = return NoContent
     hellos = return . fromMaybe "???" :<|> return "there!"
+    protected handler _VerifiedJWT = handler
 
 api :: Proxy API
 api = Proxy
