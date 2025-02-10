@@ -26,7 +26,7 @@ type Hellos =
 server :: DB.Environment -> Session.Environment -> Server API
 server dbEnv sessionEnv =
   getFavicon
-    :<|> redirectTo "/login"
+    :<|> redirectTo [] "/login"
     :<|> Login.handlers sessionEnv "/greeting"
     :<|> Greeting.handlers dbEnv "/greeting"
     :<|> (concat <$> liftIO (DB.queryGreetings dbEnv))

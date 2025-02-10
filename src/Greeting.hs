@@ -26,7 +26,7 @@ type GetPage = Get '[HTML] (Html ())
 type AddRequest = "add" :> ReqBody '[FormUrlEncoded] Greeting.Form :> Post '[HTML] NoContent
 
 handlers :: DB.Environment -> Text -> Handler (Html ()) :<|> (Form -> Handler NoContent)
-handlers env pagePath = get env pagePath :<|> \form -> Greeting.add env form >> redirectTo pagePath
+handlers env pagePath = get env pagePath :<|> \form -> Greeting.add env form >> redirectTo [] pagePath -- TODO ?
 
 table :: [String] -> Html ()
 table gs = table_ $ mapM_ (tr_ . td_ . toHtml) gs
