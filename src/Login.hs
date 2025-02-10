@@ -1,6 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE OverloadedStrings #-}
-
 module Login (Endpoints, handlers) where
 
 import Data.Text (Text)

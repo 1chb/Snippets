@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Database (Environment, runDb, queryGreetings, connectAndMigrate, insertGreeting) where
 
 import Control.Monad.IO.Unlift (MonadUnliftIO)
@@ -12,7 +10,7 @@ import Model (Greeting (..), migrateAll)
 connStr :: ConnectionString
 connStr = "host=localhost dbname=mydb user=myuser password=mypassword port=5432"
 
-connectAndMigrate :: IO ConnectionPool
+connectAndMigrate :: IO Environment
 connectAndMigrate = do
   pool <- runStdoutLoggingT $ createPostgresqlPool connStr 10
   runSqlPool (runMigration migrateAll) pool

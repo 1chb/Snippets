@@ -1,6 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE OverloadedStrings #-}
-
 module Api (api, server) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -8,6 +5,7 @@ import Data.Maybe (fromMaybe)
 import Database qualified as DB
 import Greeting qualified
 import Login qualified
+import Login.Session qualified as Session
 import Servant (Get, Header, Headers (..), JSON, NoContent (..), OctetStream, PlainText, Proxy (..), Server, addHeader, (:<|>) (..), (:>))
 import Servant.HTML.Lucid (HTML)
 import Util.Redirect (redirectTo)
@@ -25,13 +23,13 @@ type Hellos =
   Header "User-Agent" String :> Get '[PlainText] String
     :<|> "there" :> Get '[PlainText] String
 
-server :: DB.Environment -> Server API
-server env =
+server :: DB.Environment -> Session.Environment -> Server API
+server dbEnv _sessionEnv =
   getFavicon
     :<|> redirectTo "/login"
     :<|> Login.handlers "/greeting"
-    :<|> Greeting.handlers env "/greeting"
-    :<|> (concat <$> liftIO (DB.queryGreetings env))
+    :<|> Greeting.handlers dbEnv "/greeting"
+    :<|> (concat <$> liftIO (DB.queryGreetings dbEnv))
     :<|> fmap ("Hello, " <>) <$> hellos -- Only hello to snd!
     :<|> return (addHeader 2 ["X", "Y"])
   where

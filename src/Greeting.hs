@@ -1,7 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE OverloadedStrings #-}
-
 module Greeting (Endpoints, handlers) where
 
 import Control.Monad.IO.Class (MonadIO, liftIO)
