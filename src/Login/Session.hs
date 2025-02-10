@@ -1,36 +1,34 @@
 module Login.Session (Environment, generateEnv, generateJWT) where
 
--- import Crypto.Random (getRandomBytes)
-
 import Control.Monad (replicateM)
 import Control.Monad.IO.Class (MonadIO)
-import Data.Aeson qualified as Aeson
 import Data.Base64.Types (Alphabet (StdPadded), Base64, extractBase64)
 import Data.ByteString qualified as BS
 import Data.ByteString.Base64 (encodeBase64)
-import Data.Map qualified as Map
 import Data.Text (Text)
+import Data.Text qualified as T
+import Login.User (User)
 import System.Random
-import Web.JWT (ClaimsMap (..), JWTClaimsSet (iss, unregisteredClaims), encodeSigned, hmacSecret, stringOrURI)
+import Web.JWT (JWTClaimsSet (iss, sub), encodeSigned, hmacSecret, stringOrURI)
 
 newtype Environment = Env {secretKey :: SecretKey} deriving stock (Show)
 
 type SecretKey = Base64 'StdPadded Text
 
-generateEnv :: MonadIO m => m Environment
+generateEnv :: (MonadIO m) => m Environment
 generateEnv = Env <$> generateSecretKey
 
 generateSecretKey :: (MonadIO m) => m SecretKey
 generateSecretKey =
   encodeBase64 . BS.pack <$> replicateM 32 (getStdRandom genWord8)
 
-generateJWT :: Environment -> Text -> Text
-generateJWT env username =
+generateJWT :: Environment -> User -> Text
+generateJWT env user =
   let -- Create a claims set with the username as the issuer
       claimsSet =
         mempty
-          { iss = stringOrURI username,
-            unregisteredClaims = ClaimsMap $ Map.fromList [("http://example.com/is_user", Aeson.Bool True)]
+          { iss = stringOrURI "wv2.hopTo.org",
+            sub = stringOrURI $ T.show user
           }
       -- Create the signing key
       key = hmacSecret . extractBase64 $ secretKey env

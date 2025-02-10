@@ -24,10 +24,10 @@ type Hellos =
     :<|> "there" :> Get '[PlainText] String
 
 server :: DB.Environment -> Session.Environment -> Server API
-server dbEnv _sessionEnv =
+server dbEnv sessionEnv =
   getFavicon
     :<|> redirectTo "/login"
-    :<|> Login.handlers "/greeting"
+    :<|> Login.handlers sessionEnv "/greeting"
     :<|> Greeting.handlers dbEnv "/greeting"
     :<|> (concat <$> liftIO (DB.queryGreetings dbEnv))
     :<|> fmap ("Hello, " <>) <$> hellos -- Only hello to snd!
