@@ -9,15 +9,16 @@ import Data.ByteString.Base64 (encodeBase64)
 import Data.Either.Extra (eitherToMaybe)
 import Data.Text (Text)
 import Data.Text qualified as T
-import Data.Text.Encoding qualified as T (decodeUtf8', encodeUtf8)
-import User (User)
+import Data.Text.Encoding qualified as T (decodeUtf8')
 import Network.HTTP.Types (Header)
 import Network.HTTP.Types.Header (hContentType, hSetCookie)
 import Network.Wai (Request, requestHeaders)
 import Servant (AuthProtect, Context (EmptyContext, (:.)), err401, errBody, errHeaders, throwError)
 import Servant.Server.Experimental.Auth (AuthHandler, AuthServerData, mkAuthHandler)
+import Session.Cookie (createJWTSetCookie)
 import System.Random (genWord8, getStdRandom)
-import Web.Cookie (SetCookie (..), defaultSetCookie, parseCookies, renderSetCookieBS, sameSiteStrict, setCookieName, setCookiePath, setCookieValue)
+import User (User)
+import Web.Cookie (parseCookies, renderSetCookieBS)
 import Web.JWT (JWT, JWTClaimsSet (iss, sub), VerifiedJWT)
 import Web.JWT qualified as JWT
 
@@ -74,16 +75,3 @@ jwtAuthHandler env = mkAuthHandler handler
       Nothing -> throwError err401 {errBody = msg, errHeaders = [("Content-Type", "text/html")]} -- TODO: Add a login link
         where
           msg = "<html><body><h1>Unauthorized</h1><p>You need to log in to access this page.</p></body></html>"
-
-createJWTSetCookie :: Text -> SetCookie
-createJWTSetCookie jwtToken =
-  defaultSetCookie
-    { setCookieName = "authToken",
-      setCookieValue = T.encodeUtf8 jwtToken,
-      setCookiePath = Just "/",
-      setCookieHttpOnly = True, -- Prevents JavaScript access
-      setCookieSecure = True, -- Ensures the cookie is sent over HTTPS
-      setCookieSameSite = Just sameSiteStrict -- sameSiteLax -- Helps mitigate cross-site request forgery (CSRF) attacks
-      -- Optionally set expiration
-      -- , setCookieExpires = Just someExpirationTime
-    }

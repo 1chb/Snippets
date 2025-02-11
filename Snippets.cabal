@@ -79,6 +79,7 @@ library
         , Oil
         , Options
         , Session
+        , Session.Cookie
         , User
         , Util.Redirect
 
