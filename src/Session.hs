@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeFamilies #-}
 
-module Login.Session (Environment, generateEnv, headers, authContext) where
+module Session (Environment, generateEnv, headers, authContext) where
 
 import Control.Monad (replicateM, (<=<))
 import Control.Monad.IO.Class (MonadIO)
@@ -10,8 +10,7 @@ import Data.Either.Extra (eitherToMaybe)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.Encoding qualified as T (decodeUtf8', encodeUtf8)
-import Debug.Trace qualified as Debug
-import Login.User (User)
+import User (User)
 import Network.HTTP.Types (Header)
 import Network.HTTP.Types.Header (hContentType, hSetCookie)
 import Network.Wai (Request, requestHeaders)
@@ -64,8 +63,8 @@ verifyJWT env =
 
 extractToken :: Request -> Maybe BS.ByteString
 extractToken req = do
-  cookieHeader <- Debug.traceShowId $ lookup "Cookie" (Debug.traceShowId $ requestHeaders req)
-  Debug.traceShowId $ lookup "authToken" $ Debug.traceShowId $ parseCookies cookieHeader
+  cookieHeader <- lookup "Cookie" (requestHeaders req)
+  lookup "authToken" $ parseCookies cookieHeader
 
 jwtAuthHandler :: Environment -> AuthHandler Request (JWT VerifiedJWT)
 jwtAuthHandler env = mkAuthHandler handler

@@ -75,11 +75,11 @@ library
         , Greeting
         , Login
         , Login.Form
-        , Login.Session
-        , Login.User
         , Model
         , Oil
         , Options
+        , Session
+        , User
         , Util.Redirect
 
     -- Modules included in this library but not exported.

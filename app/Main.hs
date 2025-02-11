@@ -2,11 +2,11 @@ module Main where
 
 import Api (api, server)
 import Database qualified
-import Login.Session qualified as Session
 import Network.Wai.Handler.Warp qualified as Wai (defaultSettings, run, setPort)
 import Network.Wai.Handler.WarpTLS (runTLS, tlsSettings)
 import Options (Options (local, port), getOptions)
 import Servant qualified (serveWithContext)
+import Session qualified
 
 main :: IO ()
 main = do

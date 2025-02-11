@@ -2,11 +2,11 @@ module Login (Endpoints, handlers) where
 
 import Data.Text (Text)
 import Login.Form (Form, page)
-import Login.Session (Environment, headers)
-import Login.User (authenticate)
 import Lucid (Html)
 import Servant (FormUrlEncoded, Get, Handler, NoContent, Post, ReqBody, err401, errBody, throwError, (:<|>) (..), (:>))
 import Servant.HTML.Lucid (HTML)
+import Session (Environment, headers)
+import User (authenticate)
 import Util.Redirect (redirectTo)
 
 type Endpoints = GetPage :<|> PostRequest

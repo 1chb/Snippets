@@ -5,9 +5,9 @@ import Data.Maybe (fromMaybe)
 import Database qualified as DB
 import Greeting qualified
 import Login qualified
-import Login.Session qualified as Session
 import Servant (AuthProtect, Get, Header, Headers (..), JSON, NoContent (..), OctetStream, PlainText, Proxy (..), Server, addHeader, (:<|>) (..), (:>))
 import Servant.HTML.Lucid (HTML)
+import Session qualified
 import Util.Redirect (redirectTo)
 
 type API =
