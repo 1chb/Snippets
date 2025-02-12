@@ -1,6 +1,7 @@
 module Main where
 
 import Api (api, server)
+import Config.Load qualified as Config
 import Database qualified
 import Network.Wai.Handler.Warp qualified as Wai (defaultSettings, run, setPort)
 import Network.Wai.Handler.WarpTLS (runTLS, tlsSettings)
@@ -12,7 +13,7 @@ main :: IO ()
 main = do
   opts <- getOptions
   putStrLn $ "Starting server at port " ++ show (port opts)
-  sessionEnv <- Session.generateEnv
+  sessionEnv <- Config.get
   let runner =
         if local opts
           then \app -> do

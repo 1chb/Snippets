@@ -18,4 +18,4 @@ install:
 	cabal install --overwrite-policy=always exe:$(EXECUTABLE)
 
 dev: install
-	$(BINDIR)/$(EXECUTABLE) --local
+	env ADMIN_PASSWORD=aGVtbGlndA== $(BINDIR)/$(EXECUTABLE) --local

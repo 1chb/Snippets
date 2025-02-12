@@ -1,11 +1,11 @@
 {-# LANGUAGE TypeFamilies #-}
 
-module Session (Environment, generateEnv, headers, authContext) where
+module Session (Environment (..), generateSecretKey, headers, authContext) where
 
+import Config (Environment (Env, secretKey), SecretKey)
 import Control.Monad (replicateM, (<=<))
 import Control.Monad.IO.Class (MonadIO)
 import Data.ByteString qualified as BS
-import Data.ByteString.Base64 (encodeBase64)
 import Data.Either.Extra (eitherToMaybe)
 import Data.Text (Text)
 import Data.Text qualified as T
@@ -22,17 +22,7 @@ import Web.Cookie (parseCookies, renderSetCookieBS)
 import Web.JWT (JWT, JWTClaimsSet (iss, sub), VerifiedJWT)
 import Web.JWT qualified as JWT
 
-newtype Environment = Env {secretKey :: SecretKey}
-
-instance Show Environment where
-  show Env {secretKey = key} = show $ encodeBase64 key
-
 type instance AuthServerData (AuthProtect "jwt-auth") = JWT VerifiedJWT
-
-type SecretKey = BS.ByteString
-
-generateEnv :: (MonadIO m) => m Environment
-generateEnv = Env <$> generateSecretKey
 
 generateSecretKey :: (MonadIO m) => m SecretKey
 generateSecretKey =

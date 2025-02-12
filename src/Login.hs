@@ -20,7 +20,7 @@ handlers env successPath = page :<|> handler env successPath
 
 handler :: Environment -> Text -> Form -> Handler NoContent
 handler env redirectPath form = do
-  case authenticate form of
+  case authenticate env form of
     Just user ->
       redirectTo (headers env user) redirectPath
     Nothing ->
