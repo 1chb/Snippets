@@ -5,11 +5,14 @@ help:
 SERVER = base
 BINDIR = $(HOME)/.cabal/bin
 EXECUTABLE = Snippets
-SUFFIX := $(shell date +'%F+%2H.%2M.%2S')
+DESTDIR := Snippets/$(shell date +'%F+%2H.%2M.%2S')
 
-deploy: TARGET = $(EXECUTABLE)_$(SUFFIX)
 deploy: install
-	scp $(BINDIR)/$(EXECUTABLE) $(SERVER):$(TARGET)
+	ssh $(SERVER) 'mkdir -p $(DESTDIR)'
+	scp $(BINDIR)/$(EXECUTABLE) $(SERVER):$(DESTDIR)/executable
+	scp service.mk $(SERVER):$(DESTDIR)
+	ssh $(SERVER) 'ln -fns $(DESTDIR) server'
+	@echo "On the $(SERVER) server execute: ./server/service.mk NAME=<name of service> deploy"
 
 install:
 	cabal install --overwrite-policy=always exe:$(EXECUTABLE)
