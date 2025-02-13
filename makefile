@@ -16,6 +16,7 @@ deploy: install
 
 install:
 	cabal install --overwrite-policy=always exe:$(EXECUTABLE)
+	strip $(BINDIR)/$(EXECUTABLE)
 
 dev: install
 	env ADMIN_PASSWORD=aGVtbGlndA== $(BINDIR)/$(EXECUTABLE) --local
