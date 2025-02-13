@@ -80,6 +80,7 @@ library
         , Model
         , Oil
         , Options
+        , Robot
         , Session
         , Session.Cookie
         , User

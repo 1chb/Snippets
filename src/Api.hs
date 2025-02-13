@@ -5,6 +5,7 @@ import Data.Maybe (fromMaybe)
 import Database qualified as DB
 import Greeting qualified
 import Login qualified
+import Robot qualified
 import Servant (AuthProtect, Get, Header, Headers (..), JSON, NoContent (..), OctetStream, PlainText, Proxy (..), Server, addHeader, (:<|>) (..), (:>))
 import Servant.HTML.Lucid (HTML)
 import Session qualified
@@ -12,6 +13,7 @@ import Util.Redirect (redirectTo)
 
 type API =
   "favicon.ico" :> Get '[OctetStream] NoContent
+    :<|> Robot.Api
     :<|> Get '[HTML] NoContent -- Root path redirect
     :<|> "login" :> Login.Endpoints
     :<|> AuthProtect "jwt-auth" :> "greeting" :> Greeting.Endpoints
@@ -26,6 +28,7 @@ type Hellos =
 server :: DB.Environment -> Session.Environment -> Server API
 server dbEnv sessionEnv =
   getFavicon
+    :<|> Robot.handler
     :<|> redirectTo [] "/login"
     :<|> Login.handlers sessionEnv "/greeting"
     :<|> protected (Greeting.handlers dbEnv "/greeting")
