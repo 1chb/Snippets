@@ -127,3 +127,15 @@ Found the following certs:
     Certificate Path: /etc/letsencrypt/live/wv2.hopto.org/fullchain.pem
     Private Key Path: /etc/letsencrypt/live/wv2.hopto.org/privkey.pem
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Service on init V
+Startup order is wrong. Despite an explicit dependency to the
+postgresql service (and /etc/rc?.d/ links seem correct), init tries to
+start this service before postgresql!
+
+Workaround: Disabling Parallel Booting: Setting CONCURRENCY=none in
+/etc/init.d/rc forces the system to start services sequentially,
+according to the order specified by the symbolic links in directories
+like /etc/rc2.d/. This ensures that postgresql starts before
+baseServer, as intended.
+
