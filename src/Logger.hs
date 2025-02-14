@@ -14,41 +14,26 @@ import Network.Wai.Middleware.RequestLogger
     RequestLoggerSettings (autoFlush),
     defaultRequestLoggerSettings,
     destination,
-    logStdoutDev,
     mkRequestLogger,
   )
-import System.IO (hFlush, stdout)
+import System.IO (hFlush)
 import System.Log.FastLogger.LoggerSet (flushLogStr, pushLogStr)
 
 setup :: IO Middleware
-setup =
-  if True
-    then do
-      let settings = defaultRequestLoggerSettings
-      mkRequestLogger settings {destination = Callback $ timestampCallback settings}
-    else do
-      pure $ timestampLogger . logStdoutDev
-
-timestampLogger :: Middleware
-timestampLogger app request sendResponse = do
-  currentTime <- getCurrentTime
-  let timestamp = formatTime defaultTimeLocale "%Y-%m-%d %H:%M:%S" currentTime
-  putStrLn $ "[" ++ timestamp ++ "] Request received"
-  app request $ \response -> do
-    putStrLn $ "[" ++ timestamp ++ "] Response sent"
-    hFlush stdout
-    sendResponse response
+setup = do
+  let settings = defaultRequestLoggerSettings
+  mkRequestLogger settings {destination = Callback $ timestampCallback settings}
 
 timestampCallback :: RequestLoggerSettings -> Callback
-timestampCallback requestLoggerSettings logStr = do
+timestampCallback settings logStr = do
   currentTime <- getCurrentTime
   let timestamp = formatTime defaultTimeLocale "[%Y-%m-%d %H:%M:%S] " currentTime
   callback $ toLogStr timestamp <> logStr
-  Control.when requestLoggerSettings.autoFlush flush
+  Control.when settings.autoFlush flush
   where
     (callback, flush) =
       -- This code was copied from mkRequestLogger
-      case destination requestLoggerSettings of
+      case destination settings of
         Handle h -> (BS.hPutStr h . fromLogStr, hFlush h)
         Logger l -> (pushLogStr l, flushLogStr l)
         Callback c -> (c, return ())
