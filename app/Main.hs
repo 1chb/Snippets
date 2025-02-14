@@ -3,9 +3,9 @@ module Main where
 import Api (api, server)
 import Config.Load qualified as Config
 import Database qualified
+import Logger qualified
 import Network.Wai.Handler.Warp qualified as Wai (defaultSettings, run, setPort)
 import Network.Wai.Handler.WarpTLS (runTLS, tlsSettings)
-import Network.Wai.Middleware.RequestLogger (logStdoutDev)
 import Options (Options (development, port), getOptions)
 import Servant qualified (serveWithContext)
 import Session qualified
@@ -13,6 +13,7 @@ import Session qualified
 main :: IO ()
 main = do
   opts <- getOptions
+  logger <- Logger.setup
   putStrLn $ "Starting server at port " ++ show (port opts)
   sessionEnv <- Config.get
   let runner =
@@ -25,6 +26,6 @@ main = do
              in runTLS tlsConfig $ Wai.setPort (port opts) Wai.defaultSettings
   dbEnv <- Database.connectAndMigrate
   runner
-    . logStdoutDev
+    . logger
     . Servant.serveWithContext api (Session.authContext sessionEnv)
     $ server dbEnv sessionEnv
