@@ -23,7 +23,7 @@ import Options.Applicative
 
 data Options = Options
   { port :: Int,
-    local :: Bool
+    development :: Bool
   }
   deriving (Show)
 
@@ -31,7 +31,7 @@ getOptions :: IO Options
 getOptions = execParser optsParserInfo
 
 optionsParser :: Parser Options
-optionsParser = fmap replaceMagic $ Options <$> portOption <*> localSwitch
+optionsParser = fmap replaceMagic $ Options <$> portOption <*> developmentSwitch
   where
     portOption =
       option auto $
@@ -39,17 +39,17 @@ optionsParser = fmap replaceMagic $ Options <$> portOption <*> localSwitch
           <> short 'p'
           <> metavar "PORT"
           <> help "Port to listen on"
-          <> value magicPort -- Hack to make default depend on the --local switch
-          <> showDefaultWith (const "443, or 8080 if --local is set")
+          <> value magicPort -- Hack to make default depend on the --development switch
+          <> showDefaultWith (const "443, or 8080 if --development is set")
     magicPort = -1
     replaceMagic opts
-      | port opts == magicPort = opts {port = if local opts then 8080 else 443}
+      | port opts == magicPort = opts {port = if development opts then 8080 else 443}
       | otherwise = opts
-    localSwitch =
+    developmentSwitch =
       switch $
-        long "local"
-          <> help "Run a local server using the http protocol"
-          <> short 'l'
+        long "development"
+          <> help "Run a development server using the http protocol"
+          <> short 'd'
 
 optsParserInfo :: ParserInfo Options
 optsParserInfo =

@@ -19,4 +19,4 @@ install:
 	strip $(BINDIR)/$(EXECUTABLE)
 
 dev: install
-	env ADMIN_PASSWORD=aGVtbGlndA== $(BINDIR)/$(EXECUTABLE) --local
+	env ADMIN_PASSWORD=aGVtbGlndA== $(BINDIR)/$(EXECUTABLE) --development
