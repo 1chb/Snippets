@@ -1,4 +1,4 @@
-module Logger (setup) where
+module Middleware.Logger (setup) where
 
 import Control.Monad qualified as Control
 import Data.Time.Clock (getCurrentTime)
