@@ -1,9 +1,8 @@
 module Login (Endpoints, handlers) where
 
-import Data.Text (Text)
-import Login.Form (Form, page)
-import Lucid (Html)
-import Servant (FormUrlEncoded, Get, Handler, NoContent, Post, ReqBody, err401, errBody, throwError, (:<|>) (..), (:>))
+import Login.Form (Form, GetPage, PageHandler, Reason (BadCredentials), page, reason)
+import Paths (Paths (Login, Main), path)
+import Servant (FormUrlEncoded, Handler, NoContent, Post, ReqBody, (:<|>) (..), (:>))
 import Servant.HTML.Lucid (HTML)
 import Session (Environment, headers)
 import User (authenticate)
@@ -11,17 +10,17 @@ import Util.Redirect (redirectTo)
 
 type Endpoints = GetPage :<|> PostRequest
 
-type GetPage = Get '[HTML] (Html ())
-
 type PostRequest = ReqBody '[FormUrlEncoded] Form :> Post '[HTML] NoContent
 
-handlers :: Environment -> Text -> Handler (Html ()) :<|> (Form -> Handler NoContent)
-handlers env successPath = page :<|> handler env successPath
+handlers :: Environment -> PageHandler :<|> FormHandler
+handlers env = page :<|> handler env
 
-handler :: Environment -> Text -> Form -> Handler NoContent
-handler env redirectPath form = do
+type FormHandler = Form -> Handler NoContent
+
+handler :: Environment -> FormHandler
+handler env form = do
   case authenticate env form of
     Just user ->
-      redirectTo (headers env user) redirectPath
+      redirectTo (headers env user) $ path Main
     Nothing ->
-      throwError err401 {errBody = "Invalid credentials"}
+      redirectTo [] $ path Login <> "?" <> reason BadCredentials

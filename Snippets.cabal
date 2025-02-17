@@ -54,6 +54,7 @@ common shared-all
         -XBlockArguments
         -XDataKinds
         -XDerivingStrategies
+        -XLambdaCase
         -XOverloadedStrings
 
     -- Base language which the package is written in.
@@ -83,6 +84,7 @@ library
         , Model
         , Oil
         , Options
+        , Paths
         , Robot
         , Session
         , Session.Cookie

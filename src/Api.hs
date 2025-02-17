@@ -5,6 +5,7 @@ import Data.Maybe (fromMaybe)
 import Database qualified as DB
 import Greeting qualified
 import Login qualified
+import Paths (Paths (Login), path)
 import Robot qualified
 import Servant (AuthProtect, Get, Header, Headers (..), JSON, NoContent (..), OctetStream, PlainText, Proxy (..), RemoteHost, Server, addHeader, (:<|>) (..), (:>))
 import Servant.HTML.Lucid (HTML)
@@ -29,9 +30,9 @@ server :: DB.Environment -> Session.Environment -> Server API
 server dbEnv sessionEnv =
   getFavicon
     :<|> Robot.handler
-    :<|> redirectTo [] "/login"
-    :<|> Login.handlers sessionEnv "/greeting"
-    :<|> protected (Greeting.handlers dbEnv "/greeting")
+    :<|> redirectTo [] (path Login)
+    :<|> Login.handlers sessionEnv
+    :<|> protected (Greeting.handlers dbEnv)
     :<|> (concat <$> liftIO (DB.queryGreetings dbEnv))
     :<|> fmap ("Hello, " <>) <$> hellos -- Only hello to snd!
     :<|> return (addHeader 2 ["X", "Y"])
