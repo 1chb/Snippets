@@ -1,12 +1,11 @@
 module Login (Endpoints, handlers) where
 
-import Login.Form (Form, GetPage, PageHandler, Reason (BadCredentials), page, reason)
-import Paths (Paths (Login, Main), path)
+import Login.Form (Form, GetPage, PageHandler, page)
 import Servant (FormUrlEncoded, Handler, NoContent, Post, ReqBody, (:<|>) (..), (:>))
 import Servant.HTML.Lucid (HTML)
 import Session (Environment, headers)
 import User (authenticate)
-import Util.Redirect (redirectTo)
+import Util.Redirect (Path (Login, Main), Reason (BadCredentials), redirectTo)
 
 type Endpoints = GetPage :<|> PostRequest
 
@@ -21,6 +20,6 @@ handler :: Environment -> FormHandler
 handler env form = do
   case authenticate env form of
     Just user ->
-      redirectTo (headers env user) $ path Main
+      redirectTo (headers env user) Main
     Nothing ->
-      redirectTo [] $ path Login <> "?" <> reason BadCredentials
+      redirectTo [] . Login $ Just BadCredentials

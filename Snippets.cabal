@@ -84,7 +84,6 @@ library
         , Model
         , Oil
         , Options
-        , Paths
         , Robot
         , Session
         , Session.Cookie
@@ -112,6 +111,7 @@ library
         , jwt ^>=0.11.0
         , lucid ^>=2.11.20230408
         , monad-logger ^>=0.3.41
+        , mtl ^>=2.2.2
         , optparse-applicative ^>=0.18.1
         , persistent ^>=2.14.6
         , persistent-postgresql ^>=2.13.6

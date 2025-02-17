@@ -13,11 +13,12 @@ import Data.Text.Encoding qualified as T (decodeUtf8')
 import Network.HTTP.Types (Header)
 import Network.HTTP.Types.Header (hContentType, hSetCookie)
 import Network.Wai (Request, requestHeaders)
-import Servant (AuthProtect, Context (EmptyContext, (:.)), err401, errBody, errHeaders, throwError)
+import Servant (AuthProtect, Context (EmptyContext, (:.)))
 import Servant.Server.Experimental.Auth (AuthHandler, AuthServerData, mkAuthHandler)
 import Session.Cookie (createJWTSetCookie)
 import System.Random (genWord8, getStdRandom)
 import User (User)
+import Util.Redirect (Path (Login), Reason (NeedToLogIn), redirectTo)
 import Web.Cookie (parseCookies, renderSetCookieBS)
 import Web.JWT (JWT, JWTClaimsSet (iss, sub), VerifiedJWT)
 import Web.JWT qualified as JWT
@@ -62,6 +63,4 @@ jwtAuthHandler env = mkAuthHandler handler
   where
     handler req = case extractToken req >>= verifyJWT env of
       Just jwt -> return jwt
-      Nothing -> throwError err401 {errBody = msg, errHeaders = [("Content-Type", "text/html")]} -- TODO: Add a login link
-        where
-          msg = "<html><body><h1>Unauthorized</h1><p>You need to log in to access this page.</p></body></html>"
+      Nothing -> redirectTo [] . Login $ Just NeedToLogIn
