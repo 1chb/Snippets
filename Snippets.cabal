@@ -112,6 +112,7 @@ library
         , lucid ^>=2.11.20230408
         , monad-logger ^>=0.3.41
         , mtl ^>=2.2.2
+        , network ^>=3.2.7
         , optparse-applicative ^>=0.18.1
         , persistent ^>=2.14.6
         , persistent-postgresql ^>=2.13.6
@@ -143,6 +144,7 @@ executable Snippets
 
     -- Other library packages from which modules are imported.
     build-depends:
+        , text ^>=2.1.2
         , warp ^>=3.4.7
         , warp-tls ^>=3.4.12
         , Snippets ^>=0.1.0
