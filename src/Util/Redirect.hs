@@ -1,51 +1,57 @@
 module Util.Redirect
   ( redirectTo,
     Path (..),
-    Reason (..),
-    reason,
+    LoginReason (..),
+    loginReason,
     compile,
     Login,
     Greetings,
+    VerifyLoggedOut,
   )
 where
 
 import Control.Monad.Error.Class (MonadError)
-import Data.String (IsString)
+import Data.Proxy (Proxy (..))
+import Data.String (IsString (fromString))
+import GHC.TypeLits (KnownSymbol, symbolVal)
 import Network.HTTP.Types (Header, hLocation)
 import Servant (FromHttpApiData (..), ServerError, err303, errHeaders, throwError)
 
 data Path
-  = Login (Maybe Reason)
+  = Login (Maybe LoginReason)
+  | VerifyLoggedOut
   | Main
 
-data Reason = NeedToLogIn | BadCredentials
-
-reason :: (IsString s, Semigroup s) => Reason -> s
-reason =
-  ("reason=" <>) . \case
-    NeedToLogIn -> "1"
-    BadCredentials -> "2"
-
-instance FromHttpApiData Reason where
-  parseUrlPiece = \case
-    "1" -> pure NeedToLogIn
-    "2" -> pure BadCredentials
-    _ -> Left "BadRequest"
-
-compile :: (IsString s, Semigroup s) => Path -> s
-compile = \case
-  Login mReason -> "/" <> login <> maybe "" (("?" <>) . reason) mReason
-  Main -> "/" <> greetings
+data LoginReason = NeedToLogIn | BadCredentials | LoggedOut
 
 type Login = "login"
 
-login :: (IsString s) => s
-login = "login"
-
 type Greetings = "greetings"
 
-greetings :: (IsString s) => s
-greetings = "greetings"
+type VerifyLoggedOut = "--verify-logged-out"
+
+loginReason :: (IsString s, Semigroup s) => LoginReason -> s
+loginReason =
+  ("reason=" <>) . \case
+    NeedToLogIn -> "1"
+    BadCredentials -> "2"
+    LoggedOut -> "3"
+
+instance FromHttpApiData LoginReason where
+  parseUrlPiece = \case
+    "1" -> pure NeedToLogIn
+    "2" -> pure BadCredentials
+    "3" -> pure LoggedOut
+    _ -> Left "BadRequest"
+
+compile :: (IsString str, Semigroup str) => Path -> str
+compile = \case
+  Login mReason -> "/" <> str @Login Proxy <> maybe "" (("?" <>) . loginReason) mReason
+  VerifyLoggedOut -> "/" <> str @VerifyLoggedOut Proxy
+  Main -> "/" <> str @Greetings Proxy
+  where
+    str :: (KnownSymbol typ, IsString str) => Proxy typ -> str
+    str = fromString . symbolVal
 
 redirectTo :: (MonadError ServerError m) => [Header] -> Path -> m a
 redirectTo extraHeaders path =

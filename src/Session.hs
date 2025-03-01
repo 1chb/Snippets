@@ -12,13 +12,13 @@ import Data.Text qualified as T
 import Data.Text.Encoding qualified as T (decodeUtf8')
 import Network.HTTP.Types (Header)
 import Network.HTTP.Types.Header (hContentType, hSetCookie)
-import Network.Wai (Request, requestHeaders)
+import Network.Wai (Request (rawPathInfo), requestHeaders)
 import Servant (AuthProtect, Context (EmptyContext, (:.)))
 import Servant.Server.Experimental.Auth (AuthHandler, AuthServerData, mkAuthHandler)
-import Session.Cookie (createJWTSetCookie)
+import Session.Cookie qualified
 import System.Random (genWord8, getStdRandom)
 import User (User)
-import Util.Redirect (Path (Login), Reason (NeedToLogIn), redirectTo)
+import Util.Redirect (LoginReason (LoggedOut, NeedToLogIn), Path (Login, VerifyLoggedOut), compile, redirectTo)
 import Web.Cookie (parseCookies, renderSetCookieBS)
 import Web.JWT (JWT, JWTClaimsSet (iss, sub), VerifiedJWT)
 import Web.JWT qualified as JWT
@@ -31,7 +31,7 @@ generateSecretKey =
 
 headers :: Environment -> User -> [Header]
 headers env user =
-  let cookie = createJWTSetCookie $ generateJWT env user
+  let cookie = Session.Cookie.createJWTSet $ generateJWT env user
    in [ (hSetCookie, renderSetCookieBS cookie),
         (hContentType, "text/plain")
       ]
@@ -63,4 +63,7 @@ jwtAuthHandler env = mkAuthHandler handler
   where
     handler req = case extractToken req >>= verifyJWT env of
       Just jwt -> return jwt
-      Nothing -> redirectTo [] . Login $ Just NeedToLogIn
+      Nothing ->
+        redirectTo [] . Login $
+          Just $
+            if rawPathInfo req == compile VerifyLoggedOut then LoggedOut else NeedToLogIn

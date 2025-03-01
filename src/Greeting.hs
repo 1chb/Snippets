@@ -6,6 +6,7 @@ import Data.Text (Text)
 import Data.Text qualified as T
 import Database qualified as DB
 import GHC.Generics (Generic)
+import Logout qualified
 import Lucid (Html, action_, body_, button_, disabled_, form_, h1_, head_, html_, id_, input_, method_, name_, oninput_, onsubmit_, script_, table_, td_, title_, toHtml, tr_, type_)
 import Servant (FormUrlEncoded, Get, Handler, NoContent, Post, ReqBody, (:<|>) (..), (:>))
 import Servant.HTML.Lucid (HTML)
@@ -40,6 +41,7 @@ get env = do
   return $ html_ $ do
     head_ $ title_ "Greetings Table"
     body_ $ do
+      Logout.button
       h1_ "List of Greetings"
       table greetings
       input

@@ -5,12 +5,12 @@ import Data.Text (Text)
 import Lucid (Html, action_, body_, br_, doctype_, form_, h1_, head_, html_, input_, label_, method_, name_, p_, style_, title_, type_, value_)
 import Servant (Get, Handler, QueryParam, (:>))
 import Servant.HTML.Lucid
-import Util.Redirect (Reason (BadCredentials, NeedToLogIn))
+import Util.Redirect (LoginReason (BadCredentials, LoggedOut, NeedToLogIn))
 import Web.FormUrlEncoded (FromForm (..), parseUnique)
 
-type GetPage = QueryParam "reason" Reason :> Get '[HTML] (Html ())
+type GetPage = QueryParam "reason" LoginReason :> Get '[HTML] (Html ())
 
-type PageHandler = Maybe Reason -> Handler (Html ())
+type PageHandler = Maybe LoginReason -> Handler (Html ())
 
 data Form = LoginForm
   { username :: Text,
@@ -35,6 +35,7 @@ page reason_ = return $ do
         p_ [style_ "color:red;"] . \case
           NeedToLogIn -> "Unauthorized - You need to login before doing that."
           BadCredentials -> "Invalid credentials - Please try again."
+          LoggedOut -> "You have successfully been logged out."
       form_ [method_ "post", action_ "/login"] $ do
         label_ "Username: "
         input_ [type_ "text", name_ "username"]

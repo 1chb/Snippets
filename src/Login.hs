@@ -5,7 +5,7 @@ import Servant (FormUrlEncoded, Handler, NoContent, Post, ReqBody, (:<|>) (..), 
 import Servant.HTML.Lucid (HTML)
 import Session (Environment, headers)
 import User (authenticate)
-import Util.Redirect (Path (Login, Main), Reason (BadCredentials), redirectTo)
+import Util.Redirect (LoginReason (BadCredentials), Path (Login, Main), redirectTo)
 
 type Endpoints = GetPage :<|> PostRequest
 

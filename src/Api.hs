@@ -5,6 +5,7 @@ import Data.Maybe (fromMaybe)
 import Database qualified as DB
 import Greeting qualified
 import Login qualified
+import Logout qualified
 import Robot qualified
 import Servant (AuthProtect, Get, Header, Headers (..), JSON, NoContent (..), OctetStream, PlainText, Proxy (..), RemoteHost, Server, addHeader, (:<|>) (..), (:>))
 import Servant.HTML.Lucid (HTML)
@@ -16,6 +17,7 @@ type API =
     :<|> Robot.Api
     :<|> Get '[HTML] NoContent -- Root path redirect
     :<|> Login :> Login.Endpoints
+    :<|> AuthProtect "jwt-auth" :> Logout.Endpoints
     :<|> AuthProtect "jwt-auth" :> Greetings :> Greeting.Endpoints
     :<|> "old" :> Get '[PlainText] String
     :<|> "hello" :> Hellos
@@ -31,6 +33,7 @@ server dbEnv sessionEnv =
     :<|> Robot.handler
     :<|> redirectTo [] (Login Nothing)
     :<|> Login.handlers sessionEnv
+    :<|> protected Logout.handlers
     :<|> protected (Greeting.handlers dbEnv)
     :<|> (concat <$> liftIO (DB.queryGreetings dbEnv))
     :<|> fmap ("Hello, " <>) <$> hellos -- Only hello to snd!

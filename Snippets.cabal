@@ -79,6 +79,7 @@ library
         , Greeting
         , Login
         , Login.Form
+        , Logout
         , Middleware.Delayer
         , Middleware.Logger
         , Model
