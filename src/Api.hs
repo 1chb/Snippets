@@ -33,15 +33,14 @@ server dbEnv sessionEnv =
     :<|> Robot.handler
     :<|> redirectTo [] (Login Nothing)
     :<|> Login.handlers sessionEnv
-    :<|> protected Logout.handlers
-    :<|> protected (Greeting.handlers dbEnv)
+    :<|> Session.justProtect Logout.handlers
+    :<|> (Greeting.handlers dbEnv)
     :<|> (concat <$> liftIO (DB.queryGreetings dbEnv))
     :<|> fmap ("Hello, " <>) <$> hellos -- Only hello to snd!
     :<|> return (addHeader 2 ["X", "Y"])
   where
     getFavicon = return NoContent
     hellos = (\a b -> return $ fromMaybe "Unknown agent" a <> "\n" <> show b) :<|> return "there!"
-    protected handler _VerifiedJWT = handler
 
 api :: Proxy API
 api = Proxy
