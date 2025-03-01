@@ -10,7 +10,6 @@ import Data.ByteString qualified as BS
 import Data.Either.Extra (eitherToMaybe)
 import Data.Text (Text)
 import Data.Text qualified as T
-import Data.Text.Encoding qualified as T (decodeUtf8')
 import Data.Text.Encoding qualified as TE
 import Network.HTTP.Types (Header)
 import Network.HTTP.Types.Header (hContentType, hSetCookie)
@@ -63,7 +62,7 @@ generateJWT env user =
 
 verifyJWT :: Environment -> BS.ByteString -> Maybe (JWT VerifiedJWT)
 verifyJWT env =
-  JWT.decodeAndVerifySignature (JWT.VerifyHMACSecret $ secretKey env) <=< eitherToMaybe . T.decodeUtf8'
+  JWT.decodeAndVerifySignature (JWT.VerifyHMACSecret $ secretKey env) <=< eitherToMaybe . TE.decodeUtf8'
 
 extractToken :: Request -> Maybe BS.ByteString
 extractToken req = do

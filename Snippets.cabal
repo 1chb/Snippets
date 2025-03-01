@@ -172,3 +172,7 @@ test-suite Snippets-test
     -- Test dependencies.
     build-depends:
         , Snippets
+        , http-types ^>=0.12.4
+        , warp ^>=3.4.7
+        , http-client ^>=0.7.18
+        , hspec ^>=2.11.11

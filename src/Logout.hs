@@ -1,7 +1,7 @@
 module Logout (Endpoints, handlers, button) where
 
 import Control.Monad.Extra (whenJust)
-import Lucid (Html, action_, body_, button_, form_, h1_, head_, html_, method_, p_, renderBS, script_, title_, toHtml, type_, span_, div_, style_)
+import Lucid (Html, action_, body_, button_, div_, form_, h1_, head_, html_, method_, p_, renderBS, script_, span_, style_, title_, toHtml, type_)
 import Network.HTTP.Types.Header (hSetCookie)
 import Servant (Get, Handler, JSON, NoContent, Post, err400, errBody, throwError, (:<|>) (..), (:>))
 import Session.Cookie qualified

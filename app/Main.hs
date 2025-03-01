@@ -1,6 +1,6 @@
 module Main where
 
-import Api (api, server)
+import Api (api, app)
 import Config.Load qualified as Config
 import Data.Function ((&))
 import Data.Text qualified as T
@@ -11,7 +11,7 @@ import Middleware.Logger qualified as Logger
 import Network.Wai.Handler.Warp qualified as Wai (defaultSettings, run, setOnException, setPort)
 import Network.Wai.Handler.WarpTLS (runTLS, tlsSettings)
 import Options (Options (development, port), getOptions)
-import Servant qualified (layoutWithContext, serveWithContext)
+import Servant qualified (layoutWithContext)
 import Session qualified
 
 main :: IO ()
@@ -23,9 +23,9 @@ main = do
   TIO.putStrLn $ "Starting server at port " <> T.show (port opts)
   let runner =
         if development opts
-          then \app -> do
+          then \app' -> do
             print sessionEnv -- show this in development mode only.
-            Wai.run (port opts) app
+            Wai.run (port opts) app'
           else
             let certFile = "/etc/letsencrypt/live/wv2.hopto.org/fullchain.pem"
                 keyFile = "/etc/letsencrypt/live/wv2.hopto.org/privkey.pem"
@@ -37,5 +37,4 @@ main = do
   runner
     . delayBadRequests
     . logger
-    . Servant.serveWithContext api (Session.authContext sessionEnv)
-    $ server dbEnv sessionEnv
+    $ app dbEnv sessionEnv
