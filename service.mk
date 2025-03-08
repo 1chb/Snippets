@@ -43,6 +43,8 @@ echoMsg = echo "$(NAME) is $1 with pid=(`cat $(PIDFILE)`)."
 echoMsgNot = echo "$(NAME) is not $1."
 isRunning = [ -f $(PIDFILE) ] && kill -0 `cat $(PIDFILE)` 2> /dev/null
 
+ENVIRONMENT = LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+
 .PHONY: status
 status:
 	@if $(isRunning); then \
