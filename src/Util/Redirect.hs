@@ -23,6 +23,7 @@ data Path
   | Main
 
 data LoginReason = NeedToLogIn | BadCredentials | LoggedOut
+  deriving stock (Eq)
 
 type Login = "login"
 

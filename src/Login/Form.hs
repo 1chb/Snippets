@@ -2,8 +2,8 @@ module Login.Form (Form (..), page, GetPage, PageHandler) where
 
 import Control.Monad.Extra (whenJust)
 import Data.Text (Text)
-import Lucid (Html, action_, body_, br_, doctype_, form_, h1_, head_, html_, input_, label_, method_, name_, p_, style_, title_, type_, value_)
-import Servant (Get, Handler, QueryParam, (:>))
+import Lucid (Html, action_, body_, br_, doctype_, form_, h1_, head_, html_, input_, label_, method_, name_, p_, renderBS, style_, title_, type_, value_)
+import Servant (Get, Handler, QueryParam, err401, errBody, throwError, (:>))
 import Servant.HTML.Lucid
 import Util.Redirect (LoginReason (BadCredentials, LoggedOut, NeedToLogIn))
 import Web.FormUrlEncoded (FromForm (..), parseUnique)
@@ -16,7 +16,7 @@ data Form = LoginForm
   { username :: Text,
     _password :: Text
   }
-  deriving stock (Eq)
+  deriving stock (Eq, Show)
 
 instance FromForm Form where
   fromForm f =
@@ -25,7 +25,15 @@ instance FromForm Form where
       <*> parseUnique "password" f
 
 page :: PageHandler
-page reason_ = return $ do
+page reason
+  | reason `elem` (Just <$> [BadCredentials, NeedToLogIn]) = do
+      html <- page' reason
+      throwError err401 {errBody = renderBS html}
+  | otherwise = page' reason
+  where
+
+page' :: PageHandler
+page' reason_ = return $ do
   doctype_
   html_ $ do
     head_ $ title_ "Login Page"

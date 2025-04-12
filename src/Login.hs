@@ -6,6 +6,7 @@ import Servant.HTML.Lucid (HTML)
 import Session (Environment, headers)
 import User (authenticate)
 import Util.Redirect (LoginReason (BadCredentials), Path (Login, Main), redirectTo)
+import qualified Debug.Trace as Debug
 
 type Endpoints = GetPage :<|> PostRequest
 
@@ -18,7 +19,7 @@ type FormHandler = Form -> Handler NoContent
 
 handler :: Environment -> FormHandler
 handler env form = do
-  case authenticate env form of
+  case authenticate (Debug.trace "*** Login.handler ***" env) $ Debug.traceShowId form of
     Just user ->
       redirectTo (headers env user) Main
     Nothing ->

@@ -23,11 +23,12 @@ import Util.Redirect (LoginReason (LoggedOut, NeedToLogIn), Path (Login, VerifyL
 import Web.Cookie (parseCookies, renderSetCookieBS)
 import Web.JWT (JWT, JWTClaimsSet (iss, sub), VerifiedJWT)
 import Web.JWT qualified as JWT
+import qualified Debug.Trace as Debug
 
 type instance AuthServerData (AuthProtect "jwt-auth") = User
 
 authContext :: Environment -> Context (AuthHandler Request User ': '[])
-authContext env = jwtAuthHandler env :. EmptyContext
+authContext env = jwtAuthHandler (Debug.trace "*** authContext ***" env) :. EmptyContext
 
 jwtAuthHandler :: Environment -> AuthHandler Request User
 jwtAuthHandler env = mkAuthHandler handler

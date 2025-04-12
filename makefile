@@ -26,4 +26,6 @@ dev: install
 
 .PHONY: test
 test:
-	cabal test
+	cabal test $(call whenDef,--test-options='--match=,$(MATCH),')
+
+whenDef = $(if $(2:''=),$1$2$3,)
